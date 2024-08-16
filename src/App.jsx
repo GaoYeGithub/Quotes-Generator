@@ -8,10 +8,22 @@ export default function App() {
   const [quotes, setQuotes] = useState([]);
   const [num, setNum] = useState(0);
   const [likedQuotes, setLikedQuotes] = useState([]);
+  const [darkMode, setDarkMode] = useState(false);
 
   useEffect(() => {
     getQuotes();
   }, []);
+
+  useEffect(() => {
+    const savedLikedQuotes = JSON.parse(localStorage.getItem("likedQuotes"));
+    if (savedLikedQuotes) {
+      setLikedQuotes(savedLikedQuotes);
+    }
+  }, []);
+
+  useEffect(() => {
+    localStorage.setItem("likedQuotes", JSON.stringify(likedQuotes));
+  }, [likedQuotes]);
 
   async function getQuotes() {
     try {
@@ -32,6 +44,11 @@ export default function App() {
     setNum(num - 1);
   }
 
+  function randomQuote() {
+    const randomIndex = Math.floor(Math.random() * quotes.length);
+    setNum(randomIndex);
+  }
+
   function likeQuote() {
     const likedQuote = quotes[num];
     setLikedQuotes([...likedQuotes, likedQuote]);
@@ -42,8 +59,21 @@ export default function App() {
     setLikedQuotes(updatedLikedQuotes);
   }
 
+  function shareQuote() {
+    const quote = quotes[num];
+    const shareText = `"${quote.text}" - ${quote.author ? quote.author : "Anonymous"}`;
+    navigator.share({
+      title: "Quote",
+      text: shareText,
+    });
+  }
+
+  function toggleDarkMode() {
+    setDarkMode(!darkMode);
+  }
+
   return (
-    <div className="App">
+    <div className={`App ${darkMode ? "dark-mode" : ""}`}>
       <h1 className="title">Quotes Generator</h1>
       <p className="quotes">{quotes[num] && quotes[num].text}</p>
       <p className="author">- {quotes[num] && quotes[num].author ? quotes[num].author : "Anonymous"}</p>
@@ -53,8 +83,17 @@ export default function App() {
       <button className="button" onClick={next}>
         Next
       </button>
+      <button className="button" onClick={randomQuote}>
+        🎲 Random
+      </button>
       <button className="button" onClick={likeQuote}>
         ❤️ Like
+      </button>
+      <button className="button" onClick={shareQuote}>
+        📤 Share
+      </button>
+      <button className="button" onClick={toggleDarkMode}>
+        {darkMode ? "☀️ Light Mode" : "🌙 Dark Mode"}
       </button>
       <div className="liked-quotes">
         <h2>Liked Quotes</h2>

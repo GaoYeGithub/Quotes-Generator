@@ -46,3 +46,7 @@ button:active {
   font-family: "Grandstander", cursive;
 }
 
+.dark-mode {
+  background-color: #333;
+  color: #fff;
+}
